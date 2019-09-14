@@ -13,6 +13,7 @@
              v-html="compiledMarkdown"
         ></div>
         <textarea v-model="textInput"
+                  @input="setTextareaHeight"
                   ref="editArea"
                   @blur="saveNote"
                   v-show="edit"
@@ -64,7 +65,10 @@
         methods: {
             showEdit() {
                 this.edit = true;
-                this.$nextTick(() => this.$refs.editArea.focus());
+                this.$nextTick(() => {
+                    this.$refs.editArea.focus();
+                    this.setTextareaHeight();
+                });
             },
 
             saveNote() {
@@ -76,6 +80,13 @@
                 if (confirm("Are you sure you want to delete this note?")) {
                     this.$emit("delete",{...this.note})
                 }
+            },
+
+            setTextareaHeight() {
+                const editArea = this.$refs.editArea;
+
+                editArea.style.height = "auto";
+                editArea.style.height = (editArea.scrollHeight) + "px";
             }
         },
 
@@ -125,12 +136,14 @@
     }
 
     .note-container textarea {
-        /*max-width: 560px;*/
         width: 100%;
         min-height: 357px;
         display: block;
         padding: 10px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
         resize: none;
+        overflow-y: hidden;
     }
 
     .markdown-display {
