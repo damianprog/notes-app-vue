@@ -125,7 +125,8 @@
     }
 
     .note-container textarea {
-        width: 560px;
+        /*max-width: 560px;*/
+        width: 100%;
         min-height: 357px;
         display: block;
         padding: 10px;

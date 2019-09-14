@@ -84,6 +84,7 @@
 <style scoped>
     .main-container {
         text-align: center;
+        margin: 0 15px;
     }
 
     h1 {
