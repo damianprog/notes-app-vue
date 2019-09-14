@@ -3,8 +3,8 @@
         <div class="top-bar">
             <span>{{creationDate}}</span>
             <div class="icons">
-                <i class="fas fa-check"></i>
-                <i class="fas fa-trash-alt"></i>
+                <i :class="actionIcon"></i>
+                <i @click="deleteNote" class="fas fa-trash-alt"></i>
             </div>
         </div>
         <div class="markdown-display"
@@ -14,7 +14,7 @@
         ></div>
         <textarea v-model="textInput"
                   ref="editArea"
-                  @blur="saveInput"
+                  @blur="saveNote"
                   v-show="edit"
         ></textarea>
     </div>
@@ -25,7 +25,7 @@
         name: "Note",
 
         props: {
-            noteData: {
+            note: {
                 type: Object,
                 default: () => {
                 }
@@ -35,7 +35,7 @@
         data() {
             return {
                 edit: false,
-                textInput: this.noteData.text
+                textInput: this.note.text
             }
         },
 
@@ -50,11 +50,14 @@
                     minute: '2-digit'
                 };
 
-                return new Date(Number(this.noteData.createdAt))
+                return new Date(Number(this.note.createdAt))
                     .toLocaleDateString("en-US", options);
             },
             compiledMarkdown: function () {
-                return marked(this.noteData.text);
+                return marked(this.note.text);
+            },
+            actionIcon() {
+                return this.edit ? "fas fa-edit" : "fas fa-check";
             }
         },
 
@@ -64,11 +67,24 @@
                 this.$nextTick(() => this.$refs.editArea.focus());
             },
 
-            saveInput() {
-                this.$emit("save", {...this.noteData, text: this.textInput});
+            saveNote() {
+                this.$emit("save", {...this.note, text: this.textInput});
                 this.edit = false;
+            },
+
+            deleteNote() {
+                if (confirm("Are you sure you want to delete this note?")) {
+                    this.$emit("delete",{...this.note})
+                }
             }
         },
+
+        watch: {
+            note(data) {
+                this.textInput = data.text;
+            }
+        }
+
     }
 </script>
 
@@ -77,7 +93,7 @@
         background-color: #f9f9f9;
         min-height: 400px;
         max-width: 560px;
-        margin: auto;
+        margin: 0 auto 40px auto;
         text-align: left;
         box-shadow: 3px 3px 10px #000;
         border-radius: 3px;
@@ -131,6 +147,7 @@
 
     .fa-trash-alt {
         color: #dd2c00;
+        cursor: pointer;
     }
 
 </style>

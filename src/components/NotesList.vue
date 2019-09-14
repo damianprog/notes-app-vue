@@ -1,48 +1,60 @@
 <template>
     <div class="main-container">
-        <h1>Notes App Vue</h1>
-        <note
+        <div class="header-actions">
+            <h1>Notes App Vue</h1>
+            <i @click="createNote" class="fas fa-plus"></i>
+        </div>
+        <notes-list-note
                 v-for="note in allNotes"
-                :note-data="note"
+                :note="note"
                 @save="onSave($event)"
-        ></note>
+                @delete="onDelete($event)"
+        ></notes-list-note>
     </div>
 </template>
 
 <script>
-    import Note from "./Note";
+    import NotesListNote from "./NotesListNote";
 
     export default {
         name: "NotesList",
 
         components: {
-            Note
+            NotesListNote
         },
 
         data() {
             return {
-                notes: [{
-                    createdAt: Date.now().toString(),
-                    text: " # Welcome to Vue notes!\n\n ### You can:\n\n " +
-                        "- **Click plus sign above to create a new note**\n\n" +
-                        "- **Click this note to edit**\n\n" +
-                        "- **Click outside this note to save it **\n\n" +
-                        "- **... and many more! **\n\n"
-                }]
+                notes: []
             }
         },
 
         computed: {
             allNotes() {
-                return this.notes.sort();
+                return this.notes.sort((a,b) => {
+                    return a.createdAt - b.createdAt;
+                }).reverse();
             }
         },
 
         methods: {
-            onSave(updatedNote) {
-                this.notes = this.notes.filter(note => note.createdAt !== updatedNote.createdAt);
-                this.notes.push({...updatedNote});
+            onSave(note) {
+                this.notes = this.notes.filter(n => n.createdAt !== note.createdAt);
+                this.notes.push({...note});
 
+                this.updateStorage();
+            },
+            createNote() {
+                this.notes.push({createdAt: Date.now().toString(),text: ""});
+
+                this.updateStorage();
+            },
+            onDelete(note) {
+                this.notes = this.notes.filter(n => n.createdAt !== note.createdAt);
+
+                this.updateStorage();
+            },
+            updateStorage() {
                 window.localStorage.setItem("notes-app-vue", JSON.stringify(this.notes));
             }
         },
@@ -54,10 +66,15 @@
             if (notes && notes.length > 0) {
                 this.notes = [...notes];
             } else {
-                storage.setItem("notes-app-vue", JSON.stringify([{
+                this.notes = [{
                     createdAt: Date.now().toString(),
-                    text: "# Welcome to Vue notes!\n\nYou can:."
-                }]));
+                    text: " # Welcome to Vue notes!\n\n ### You can:\n\n " +
+                        "- **Click plus sign above to create a new note**\n\n" +
+                        "- **Click note to edit**\n\n" +
+                        "- **Click outside note to save it **\n\n" +
+                        "- **... and many more! **\n\n"
+                }];
+                this.updateStorage();
             }
         }
     }
@@ -66,6 +83,23 @@
 <style scoped>
     .main-container {
         text-align: center;
+    }
+
+    h1 {
+        margin: 0;
+    }
+
+    .header-actions {
+        display:flex;
+        justify-content: space-between;
+        max-width: 560px;
+        margin: 20px auto;
+    }
+
+    .fa-plus {
+        color: #880e4f;
+        font-size: 35px;
+        cursor: pointer;
     }
 
 </style>
