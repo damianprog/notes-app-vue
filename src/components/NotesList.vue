@@ -5,7 +5,7 @@
             <i @click="createNote" class="fas fa-plus"></i>
         </div>
         <notes-list-note
-                v-for="note in allNotes"
+                v-for="note in sortedNotes"
                 :note="note"
                 @save="onSave($event)"
                 @delete="onDelete($event)"
@@ -30,7 +30,7 @@
         },
 
         computed: {
-            allNotes() {
+            sortedNotes() {
                 return this.notes.sort((a,b) => {
                     return a.createdAt - b.createdAt;
                 }).reverse();
@@ -72,6 +72,7 @@
                         "- **Click plus sign above to create a new note**\n\n" +
                         "- **Click note to edit**\n\n" +
                         "- **Click outside note to save it **\n\n" +
+                        "- **Click bin icon to remove note **\n\n" +
                         "- **... and many more! **\n\n"
                 }];
                 this.updateStorage();
